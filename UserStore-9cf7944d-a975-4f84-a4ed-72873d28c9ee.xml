@@ -1,0 +1,227 @@
+<entityStoreData xmlns="http://www.vordel.com/2005/06/24/entityStore">
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="Entity" name="RootChild"/>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="RootChild" name="ESConfiguration">
+        <constant name="_version" type="integer" value="21"/>
+        <!--
+            Give this singleton a key.
+        -->
+        <field isKey="true" name="name" type="string"/>
+        <!-- 
+            We use this field to verify that the passphrase for the 
+            encryped data is synchronized between the server and client, and
+            between multiple invocations of the client
+        -->
+        <field name="passphraseTest" type="encrypted"/>
+        <field name="version" type="string"/>
+        <!-- The product key should never change for the lifetime of the product -->
+        <field name="productKey" type="string"/>
+        <field cardinality="?" name="gitrev" type="string"/>
+    </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="RootChild" name="LoadableModule">
+        <constant name="_version" type="integer" value="2"/>
+        <constant name="loadorder" type="integer" value="1000000"/>
+        <field cardinality="?" name="classloader" type="^ClassLoader"/>
+
+        </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="LoadableModule" name="NamedLoadableModule">
+        <constant name="_version" type="integer" value="0"/>
+		<field cardinality="1" isKey="true" name="name" type="string"/>
+	</entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="NamedLoadableModule" name="UserStore">
+      <constant name="_version" type="integer" value="3"/>
+      <constant name="class" type="string" value="com.vordel.store.user.UserStore"/>
+      <constant name="loadorder" type="integer" value="150"/>
+      <componentType cardinality="*" name="Identity"/>
+    </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="RootChild" name="NamedTopLevelGroup">
+        <constant name="_version" type="integer" value="0"/>
+		<field isKey="true" name="name" type="string"/>
+	</entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Entity" name="IdentityAttribute">
+    <constant name="_version" type="integer" value="3"/>
+
+    <field isKey="true" name="name" type="string"/>
+    <field isKey="true" name="value" type="string"/>
+    <field cardinality="1" default="String" name="type" type="string"/>
+    <field cardinality="?" name="encryptedValue" type="encrypted"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Entity" name="Identity">
+	    <constant name="_version" type="integer" value="1"/>
+
+		<componentType cardinality="*" name="IdentityAttribute"/>
+
+    <field cardinality="1" isKey="true" name="name" type="string"/>
+	</entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Identity" name="Group">
+      <constant name="_version" type="integer" value="2"/>
+	<field cardinality="*" name="member" type="^Identity"/>
+	</entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Identity" name="User">
+    <constant name="_version" type="integer" value="3"/>
+
+    <field cardinality="1" name="password" type="encrypted"/>
+    <field cardinality="?" name="certificate" type="^Certificate"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Entity" name="Root">
+  <componentType cardinality="*" name="RootChild"/>
+  <field isKey="true" name="name" type="string"/>
+
+  <!-- Used by the FileStore implementation, records the last time the store was written -->
+  <field name="lastModificationTime" type="utctime"/>
+
+  <!-- Used by the in-memory ad filestore implementations, records the next integer to use as a PK -->
+  <field name="pkInc" type="integer"/>
+
+  <!-- 
+          Provide a user-extensible means to tag an individual store, that won't interfere with federated store 
+      composition. If it's done in the root node, then there are no synchronization issues across stores in the
+      federated context, as each store naturally has full control of its root node, with only the Primary Store's
+      root being visible via the federated view.
+
+          Provide a pair of multivalued string fields. It is up to the user to ensure that the contents are
+      synchronized. One string list acts as the key, with the entry in the corresponding list at the same index giving
+      the value for that key, e.g.
+      
+          tagName[0] = 'gitrev'
+          tagName[0] = 'e39a0a77b92c5b82e5a662a7de0b33daeadfb170'
+          
+      equates to the mapping 'gitrev' -> 'e39a0a77b92c5b82e5a662a7de0b33daeadfb170'
+  -->
+  <field cardinality="*" name="tagName" type="string"/>
+  <field cardinality="*" name="tagValue" type="string"/>
+</entityType>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="Root" entityPK="0">
+	<fval name="name"><value>System Components</value></fval>
+	<fval name="tagName"><value>gitrev</value></fval>
+	<fval name="tagValue"><value>061bb77bbde04c47e9e112715659bc0324753117</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="ESConfiguration" entityPK="-7788255186776299586" parentPK="0">
+	<fval name="name"><value>Entity Store Configuration</value></fval>
+	<fval name="passphraseTest"><value>aHR0cDsvL3d3dy52b3JkZWwuY29t</value></fval>
+	<fval name="productKey"><value>VordelGateway</value></fval>
+	<fval name="version"><value>7.5.2</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="UserStore" entityPK="6222879830081159639" parentPK="0">
+	<fval name="name"><value>Default User Store</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="User" entityPK="-6875793410345752238" parentPK="6222879830081159639">
+	<fval name="certificate"><value contentType="reference">-1</value></fval>
+	<fval name="name"><value>ssouser</value></fval>
+	<fval name="password"><value>Y2hhbmdlbWU=</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="Group" entityPK="-4225160261861715835" parentPK="6222879830081159639">
+	<fval name="member"><value contentType="reference">
+<key type='UserStore'><id field='name' value='Default User Store'/><key type='User'><id field='name' value='ssouser'/></key></key>	</value></fval>
+	<fval name="name"><value>SSO</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="Group" entityPK="-2485395557155000077" parentPK="6222879830081159639">
+	<fval name="member"><value contentType="reference">
+<key type='UserStore'><id field='name' value='Default User Store'/><key type='User'><id field='name' value='soauser'/></key></key>	</value></fval>
+	<fval name="name"><value>SOA</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="User" entityPK="-2048739666113998840" parentPK="6222879830081159639">
+	<fval name="certificate"><value contentType="reference">-1</value></fval>
+	<fval name="name"><value>soauser</value></fval>
+	<fval name="password"><value>Y2hhbmdlbWU=</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="User" entityPK="342202202364244207" parentPK="6222879830081159639">
+	<fval name="certificate"><value contentType="reference">-1</value></fval>
+	<fval name="name"><value>sampleuser</value></fval>
+	<fval name="password"><value>Y2hhbmdlbWU=</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-7746306674097613389" parentPK="342202202364244207">
+	<fval name="name"><value>gender</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>female</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-7438930398070531587" parentPK="342202202364244207">
+	<fval name="name"><value>family_name</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>User</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-6961351430909883829" parentPK="342202202364244207">
+	<fval name="name"><value>given_name</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>Sample</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-5159074905089912854" parentPK="342202202364244207">
+	<fval name="name"><value>email_verified</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>true</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-4032617415242509517" parentPK="342202202364244207">
+	<fval name="name"><value>role</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>resourceowner</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="2961885190084060143" parentPK="342202202364244207">
+	<fval name="name"><value>locale</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>en</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="3205394183641031762" parentPK="342202202364244207">
+	<fval name="name"><value>picture</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>/xlib/images/sampleuser.png</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="4748040168191378564" parentPK="342202202364244207">
+	<fval name="name"><value>email</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>sampleuser@apigateway.sample</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="6668102083325506504" parentPK="342202202364244207">
+	<fval name="name"><value>hd</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>apigateway.sample</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="User" entityPK="5504839583185687333" parentPK="6222879830081159639">
+	<fval name="certificate"><value contentType="reference">-1</value></fval>
+	<fval name="name"><value>regadmin</value></fval>
+	<fval name="password"><value>Y2hhbmdlbWU=</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-4036057746376249017" parentPK="5504839583185687333">
+	<fval name="name"><value>given_name</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>Reg</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-3677813860717761374" parentPK="5504839583185687333">
+	<fval name="name"><value>role</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>admin</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-2272631987964524720" parentPK="5504839583185687333">
+	<fval name="name"><value>gender</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>male</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-597127263043558090" parentPK="5504839583185687333">
+	<fval name="name"><value>email</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>regadmin@apigateway.sample</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="-252453665800718820" parentPK="5504839583185687333">
+	<fval name="name"><value>email_verified</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>true</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="1121131393923092371" parentPK="5504839583185687333">
+	<fval name="name"><value>locale</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>en</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="1319001262225518641" parentPK="5504839583185687333">
+	<fval name="name"><value>picture</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>/xlib/images/regadmin.png</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="5433393754969327423" parentPK="5504839583185687333">
+	<fval name="name"><value>hd</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>apigateway.sample</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="IdentityAttribute" entityPK="5997853403402280649" parentPK="5504839583185687333">
+	<fval name="name"><value>family_name</value></fval>
+	<fval name="type"><value>String</value></fval>
+	<fval name="value"><value>Admin</value></fval>
+</entity>
+</entityStoreData>
