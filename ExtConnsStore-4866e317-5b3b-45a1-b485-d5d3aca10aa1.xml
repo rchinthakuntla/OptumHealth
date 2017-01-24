@@ -1939,7 +1939,7 @@
 	<fval name="username"><value>cassandra</value></fval>
 </entity>
 <entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="CassandraServer" entityPK="8988584186018489516" parentPK="5314538029694769689">
-	<fval name="host"><value>${env.Cassandra.Url}</value></fval>
+	<fval name="host"><value>10.129.62.75</value></fval>
 	<fval name="name"><value>Cassandra server</value></fval>
 	<fval name="port"><value>9160</value></fval>
 </entity>
